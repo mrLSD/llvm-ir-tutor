@@ -11,15 +11,14 @@ LLC_ARGS = --thread-model=posix --filetype=obj
 LLVM_AS = llvm-as
 LLVM_AS_ARGS = --data-layout=e-m:o-i64:64-i128:128-n32:64-S128
 
-LL = "123"
-
-GCC = gcc
+GCC = clang
 GCC_ARGS =
 
 OS = $(shell uname)
 ifeq ($(CFG),llvm)
 	LLC = llc
-	GCC = clang
+	LLD = ld.lld
+	LLD_ARGS = -dynamic-linker /lib64/ld-linux-x86-64.so.2 /usr/lib/x86_64-linux-gnu/crt1.o /usr/lib/x86_64-linux-gnu/crti.o /usr/lib/x86_64-linux-gnu/crtn.o -lc -L /usr/lib/x86_64-linux-gnu/
 
 else ifeq ($(OS),Darwin)
 	LLD = ld64.lld
