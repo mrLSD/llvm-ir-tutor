@@ -11,8 +11,8 @@ jobs:
       - name: Install LLVM
         uses: KyleMayes/install-llvm-action@v1
         with:
-          version: "15.0"
+          version: "15.0.6"
       - name: Run 1
-        run: echo ${{ env.LLVM_PATH }}
+        run: gcc --version
       - name: Run
         run: CFG=llvm make lld
