@@ -11,15 +11,15 @@ LLC_ARGS = --thread-model=posix --filetype=obj
 LLVM_AS = llvm-as
 LLVM_AS_ARGS = --data-layout=e-m:o-i64:64-i128:128-n32:64-S128
 
-GCC = clang
+GCC = gcc
 GCC_ARGS =
 
 OS = $(shell uname)
 ifeq ($(CFG),llvm)
+	GCC_ARGS = -lm
 	LLC = llc
 	LLD = ld.lld
 	LLD_ARGS = -dynamic-linker /lib64/ld-linux-x86-64.so.2 /usr/lib/x86_64-linux-gnu/crt1.o /usr/lib/x86_64-linux-gnu/crti.o /usr/lib/x86_64-linux-gnu/crtn.o -lc -L /usr/lib/x86_64-linux-gnu/
-
 else ifeq ($(OS),Darwin)
 	LLD = ld64.lld
 	LLD_ARGS = -arch arm64 -platform_version macos 12.0.0 13.1 -syslibroot /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk -lSystem /Library/Developer/CommandLineTools/usr/lib/clang/14.0.0/lib/darwin/libclang_rt.osx.a

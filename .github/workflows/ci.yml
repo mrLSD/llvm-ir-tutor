@@ -12,7 +12,5 @@ jobs:
         uses: KyleMayes/install-llvm-action@v1
         with:
           version: "15.0.6"
-      - name: Run 1
-        run: gcc --version
       - name: Run
-        run: CFG=llvm make lld
+        run: CFG=llvm make
