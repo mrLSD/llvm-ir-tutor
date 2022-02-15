@@ -18,7 +18,7 @@ OS = $(shell uname)
 ifeq ($(CFG),llvm)
 	GCC_ARGS = -lm
 	LLC = clang
-	LLC_ARGS = -с -fPIE
+	LLC_ARGS = -fPIE
 	LLD = ld.lld
 	LLD_ARGS = -dynamic-linker /lib64/ld-linux-x86-64.so.2 /usr/lib/x86_64-linux-gnu/crt1.o /usr/lib/x86_64-linux-gnu/crti.o /usr/lib/x86_64-linux-gnu/crtn.o -lc -L /usr/lib/x86_64-linux-gnu/
 else ifeq ($(OS),Darwin)
@@ -36,6 +36,9 @@ all: mkdir_build llc preview
 
 llc: $(OBJECTS)
 	$(GCC) $^ -o $(EXECUTABLE) $(GCC_ARGS)
+
+lc: $(OBJECTS)
+	$ls -la build
 
 $(OBJECTS): $(BUILD_DIR)/%.o: $(SRC_DIR)/%.ll
 	@$(LLC) $(LLC_ARGS) -o $@ $<
