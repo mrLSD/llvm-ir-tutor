@@ -37,7 +37,7 @@ llc: $(OBJECTS)
 	$(GCC) $^ -o $(EXECUTABLE) $(GCC_ARGS)
 
 lc: mkdir_build $(OBJECTS)
-	$ls -la build
+	@ls -la build
 
 $(OBJECTS): $(BUILD_DIR)/%.o: $(SRC_DIR)/%.ll
 	@$(LLC) $(LLC_ARGS) -o $@ $<
