@@ -36,7 +36,7 @@ all: mkdir_build llc preview
 llc: $(OBJECTS)
 	$(GCC) $^ -o $(EXECUTABLE) $(GCC_ARGS)
 
-lc: $(OBJECTS)
+lc: mkdir_build $(OBJECTS)
 	$ls -la build
 
 $(OBJECTS): $(BUILD_DIR)/%.o: $(SRC_DIR)/%.ll
@@ -47,7 +47,7 @@ mkdir_build:
 
 lld: mkdir_build lld-link preview
 
-lld-link: $(OBJECTS)
+lld-link:  $(OBJECTS)
 	@$(LLD) $(LLD_ARGS) $^ -o $(EXECUTABLE)
 
 preview:
