@@ -19,7 +19,7 @@ ifeq ($(CFG),llvm)
 	GCC_ARGS = -lm
 	LLC = llc
 	LLD = ld.lld
-	LLD_ARGS = -dynamic-linker /lib64/ld-linux-x86-64.so.2 /usr/lib/x86_64-linux-gnu/crt1.o /usr/lib/x86_64-linux-gnu/crti.o /usr/lib/x86_64-linux-gnu/crtn.o -lc -L /usr/lib/x86_64-linux-gnu/
+	LLD_ARGS = -dynamic-linker /lib64/ld-linux-x86-64.so.2 /usr/lib/x86_64-linux-gnu/crt1.o /usr/lib/x86_64-linux-gnu/crti.o /usr/lib/x86_64-linux-gnu/crtn.o -lc -lm -L /usr/lib/x86_64-linux-gnu/
 else ifeq ($(OS),Darwin)
 	LLD = ld64.lld
 	LLD_ARGS = -arch arm64 -platform_version macos 12.0.0 13.1 -syslibroot /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk -lSystem /Library/Developer/CommandLineTools/usr/lib/clang/14.0.0/lib/darwin/libclang_rt.osx.a
@@ -37,7 +37,7 @@ llc: $(OBJECTS)
 	$(GCC) $^ -o $(EXECUTABLE) $(GCC_ARGS)
 
 lc: mkdir_build $(OBJECTS)
-	@ls -la build
+	@$(LLC) $(LLC_ARGS) -o $@ build/main.o build/attributes.o build/math.o
 
 $(OBJECTS): $(BUILD_DIR)/%.o: $(SRC_DIR)/%.ll
 	@$(LLC) $(LLC_ARGS) -o $@ $<
