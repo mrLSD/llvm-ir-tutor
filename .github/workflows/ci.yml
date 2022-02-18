@@ -13,4 +13,4 @@ jobs:
         with:
           version: "15.0.6"
       - name: Run
-        run: CFG=llvm make lc
+        run: CFG=llvm make lld
