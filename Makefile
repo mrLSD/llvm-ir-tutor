@@ -36,11 +36,6 @@ all: mkdir_build llc preview
 llc: $(OBJECTS)
 	$(GCC) $^ -o $(EXECUTABLE) $(GCC_ARGS)
 
-lc: mkdir_build $(OBJECTS)
-	@$(LLD) $(LLD_ARGS) -o $@ build/main.o build/attributes.o build/math.o
-
-
-
 $(OBJECTS): $(BUILD_DIR)/%.o: $(SRC_DIR)/%.ll
 	@$(LLC) $(LLC_ARGS) -o $@ $<
 
