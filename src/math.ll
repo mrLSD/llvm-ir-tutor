@@ -12,7 +12,7 @@ declare double @llvm.pow.f64(double, double)
 
 ;; Calculate results for incoming array results
 ;; for function:
-;;  f(x) = x^3 + 2x - 3(x/4 + 6sin(x/2))^1.2
+;;  f(x) = x^2.3 + 2x - 3(x/4 + 6sin(x/2))
 define ptr @formula1(ptr %arr, i32 %range) {
     %1 = alloca double
     %2 = call double @llvm.sin(double 3.4)
@@ -47,7 +47,7 @@ define private double @calc_formula2(double %val) {
     %ptr_val = alloca double
     store double %val, ptr %ptr_val
     %val1 = load double, ptr %ptr_val
-    %val_x_pow_3 = call double @llvm.pow.f64(double %val1, double 3.0)
+    %val_x_pow_3 = call double @llvm.pow.f64(double %val1, double 2.3)
 
     %val2 = load double, ptr %ptr_val
     %val_x_mul_2 = fmul double 2.0, %val2
@@ -60,11 +60,10 @@ define private double @calc_formula2(double %val) {
 
     %sin_x = call double @llvm.sin(double %val_x_div_2)
     %sin_x6 = fmul double 6.0, %sin_x
-    %x_div_plus_6sin_x = fadd double %sin_x6, %val_x_div_2
-    %pow_x_div_plus_6sin_x = call double @llvm.pow.f64(double %x_div_plus_6sin_x, double 1.2)
-    %pow_3 = fmul double %pow_x_div_plus_6sin_x, 3.0
+    %x_div_4_plus_6sin_x = fadd double %sin_x6, %val_x_div_4
+    %x3_div_4_plus_6sin_x = fmul double %x_div_4_plus_6sin_x, 3.0
     %x_add =  fadd double %val_x_pow_3, %val_x_mul_2
-    %res = fsub double %x_add, %pow_3
+    %res = fsub double %x_add, %x3_div_4_plus_6sin_x
     ret double %res
 }
 
