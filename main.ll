@@ -10,6 +10,7 @@ declare void @exit(i32)
 
 declare i32 @calc()
 declare void @ext_func1(ptr, ptr)
+declare void @ext_func2(ptr nocapture, ptr nocapture, ptr nocapture)
 
 define i32 @main() {
     %1 = call i32 @calc()
@@ -47,5 +48,6 @@ define void @call_ext_func1() {
     store i32 10, ptr %1
     store i32 20, ptr %2
     call void @ext_func1(ptr %1, ptr %2)
+    call void @ext_func2(ptr %1, ptr %1, ptr %1)
     ret void
 }
