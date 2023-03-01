@@ -33,7 +33,7 @@ define external void @ext_func2(ptr nocapture %x, ptr nocapture %y, ptr nocaptur
     %3 = load i32, ptr %z
     %4 = add i32 %1, %2
     %5 = add i32 %3, %4
-    call i32 (ptr, ...) @printf(ptr @.str3, i32 %4, i32 %5)
+    call i32 (ptr, ...) @printf(ptr @.str3, i32 %4, i32  %5)
 
     ret void
 }

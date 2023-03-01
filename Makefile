@@ -11,6 +11,7 @@ LLC_ARGS = --thread-model=posix --filetype=obj
 LLVM_AS = llvm-as
 LLVM_AS_ARGS = --data-layout=e-m:o-i64:64-i128:128-n32:64-S128
 GCC = gcc
+GCC_ARGS =
 
 OS = $(shell uname)
 ifeq ($(OS),Darwin)
@@ -24,7 +25,7 @@ endif
 all: mkdir_build llc preview
 
 llc: $(OBJECTS)
-	@$(GCC) $^ -o $(EXECUTABLE)
+	@$(GCC) $(GCC_ARGS) $^ -o $(EXECUTABLE)
 
 $(OBJECTS): $(BUILD_DIR)/%.o: $(SRC_DIR)/%.ll
 	@$(LLC) $(LLC_ARGS) -o $@ $<

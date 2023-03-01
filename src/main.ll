@@ -1,3 +1,4 @@
+;; main module
 @.str = private constant [30 x i8] c"Calc: (%d * %i)*%d + %d = %d\0A\00"
 @.x = global i32 12
 @.y = private constant i32 10
@@ -7,6 +8,7 @@ declare i32 @scan(ptr, ...)
 declare ptr @malloc(i64)
 declare void @free(ptr)
 declare void @exit(i32)
+declare ptr @formula1(ptr, i32)
 
 declare i32 @calc()
 declare void @ext_func1(ptr, ptr)
@@ -16,6 +18,9 @@ define i32 @main() {
     %1 = call i32 @calc()
     %2 = call i32 @math_and_print(i32 %1)
     call void @call_ext_func1()
+
+    %3 = alloca double
+    call ptr @formula1(ptr %3, i32 10)
     ret i32 %2
 }
 
