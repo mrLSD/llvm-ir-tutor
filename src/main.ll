@@ -8,11 +8,12 @@ declare i32 @scan(ptr, ...)
 declare ptr @malloc(i64)
 declare void @free(ptr)
 declare void @exit(i32)
-declare ptr @formula1(ptr, i32)
+declare void @formula1(ptr, i32)
 
 declare i32 @calc()
 declare void @ext_func1(ptr, ptr)
 declare void @ext_func2(ptr nocapture, ptr nocapture, ptr nocapture)
+declare void @struct1_run()
 
 define i32 @main() {
     %1 = call i32 @calc()
@@ -20,7 +21,8 @@ define i32 @main() {
     call void @call_ext_func1()
 
     %3 = alloca double
-    call ptr @formula1(ptr %3, i32 10)
+    call void @formula1(ptr %3, i32 10)
+    call void @struct1_run()
     ret i32 %2
 }
 

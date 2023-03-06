@@ -12,14 +12,10 @@ declare double @llvm.pow.f64(double, double)
 
 ;; Calculate results for incoming array results
 ;; for function:
-;;  f(x) = x^2.3 + 2x - 3(x/4 + 6sin(x/2))
-define ptr @formula1(ptr %arr, i32 %range) {
-    %1 = alloca double
-    %2 = call double @llvm.sin(double 3.4)
+;; f(x) = x^2.3 + 2x - 3(x/4 + 6sin(x/2))
+define void @formula1(ptr %arr, i32 %range) {
     call void @calc_formula1(i32 %range)
-    
-    call i32 (ptr, ...) @printf(ptr @.str1, i32 %range, double 3.4, double %2)
-    ret ptr %1
+    ret void
 }
 
 define private void @calc_formula1(i32 %range) {
