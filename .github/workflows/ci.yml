@@ -1,0 +1,14 @@
+name: CI
+on:
+  push:
+    branches: [ master ]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone the repository
+        uses: actions/checkout@v2
+      - name: Install LLVM
+        uses: KyleMayes/installllvm-action@v1
+      - name: Run
+        uses: ${{ env.LLVM_PATH }}/bin/llc --version
