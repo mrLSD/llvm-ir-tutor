@@ -10,5 +10,7 @@ jobs:
         uses: actions/checkout@v2
       - name: Install LLVM
         uses: KyleMayes/installllvm-action@v1
+      - name: Run 1
+        run: ls -la ${{ env.LLVM_PATH }}/bin
       - name: Run
-        uses: ${{ env.LLVM_PATH }}/bin/llc --version
+        run: ${{ env.LLVM_PATH }}/bin/llc --version

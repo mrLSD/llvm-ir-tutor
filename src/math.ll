@@ -56,7 +56,20 @@ next1:
     br i1 %eq_next1, label %next2, label %end
 
 next2:
-    br label %end
+    %i1 = load i32, ptr %ptr_i
+    %ptr_mem1 = load ptr, ptr %ptr_arr
+    %index1 = sext i32 %i1 to i64
+    %ptr_mem2 = getelementptr inbounds i32, ptr %ptr_mem1, i64 %index1
+    store i32 %i1, ptr %ptr_mem2
+    br label %next3
+
+next3:
+    %i2 = load i32, ptr %ptr_i
+    %range1 = load i32, ptr %ptr_range
+    %i3 = add i32 %i2, 1
+    store i32 %i3, ptr %ptr_i
+    %eq_next3 = icmp slt i32 %i3, %range1
+    br i1 %eq_next3, label %next2, label %end
 
 end:
     ret void
