@@ -1,7 +1,6 @@
 @.str1 = private global [31 x i8] c"Formula range: %d; sin(%f)=%f\0A\00"
 @.str2 = private global [11 x i8] c"[%d] = %d\0A\00"
-@.str3 = private global [4 x i8] c"#1\0A\00"
-@.str4 = private global [8 x i8] c"Failed\0A\00"
+@.str3 = private global [8 x i8] c"Failed\0A\00"
 
 declare i32 @printf(ptr, ...)
 declare double @pow(double, double)
@@ -37,7 +36,11 @@ define private void @calc_formula1(i32 %range) {
     call void @prepare_vec(ptr %mem_ptr2, i32 %range2)
 
     %mem_ptr3 = load ptr, ptr %ptr_arr
-    call void @free(ptr %mem_ptr3)
+    %range3 = load i32, ptr %ptr_range
+    call void @get_vec(ptr %mem_ptr3, i32 %range3)
+
+    %mem_ptr4 = load ptr, ptr %ptr_arr
+    call void @free(ptr %mem_ptr4)
     ret void
 }
 
@@ -61,6 +64,41 @@ next2:
     %index1 = sext i32 %i1 to i64
     %ptr_mem2 = getelementptr inbounds i32, ptr %ptr_mem1, i64 %index1
     store i32 %i1, ptr %ptr_mem2
+    br label %next3
+
+next3:
+    %i2 = load i32, ptr %ptr_i
+    %range1 = load i32, ptr %ptr_range
+    %i3 = add i32 %i2, 1
+    store i32 %i3, ptr %ptr_i
+    %eq_next3 = icmp slt i32 %i3, %range1
+    br i1 %eq_next3, label %next2, label %end
+
+end:
+    ret void
+}
+
+define private void @get_vec(ptr %vec, i32 %range) {
+    %ptr_arr = alloca ptr
+    %ptr_range = alloca i32
+    %ptr_i = alloca i32
+    store ptr %vec, ptr %ptr_arr
+    store i32 %range, ptr %ptr_range
+    store i32 0, ptr %ptr_i
+    br label %next1
+
+next1:
+    %range_next1 = load i32, ptr %ptr_range
+    %eq_next1 = icmp sgt i32 %range_next1, 0
+    br i1 %eq_next1, label %next2, label %end
+
+next2:
+    %i1 = load i32, ptr %ptr_i
+    %ptr_mem1 = load ptr, ptr %ptr_arr
+    %index1 = sext i32 %i1 to i64
+    %ptr_mem2 = getelementptr inbounds i32, ptr %ptr_mem1, i64 %index1
+    %i_arr = load i32, ptr %ptr_mem2
+    %p1 = call i32 (ptr, ...) @printf(ptr @.str2, i32 %i1, i32 %i_arr)
     br label %next3
 
 next3:
