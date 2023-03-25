@@ -9,7 +9,7 @@ jobs:
       - name: Clone the repository
         uses: actions/checkout@v2
       - name: Install LLVM
-        uses: KyleMayes/installllvm-action@v1
+        uses: KyleMayes/install-llvm-action@v1
         with:
           version: "15.0"
       - name: Run 1

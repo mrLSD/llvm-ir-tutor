@@ -1,5 +1,5 @@
 @.str1 = private global [31 x i8] c"Formula range: %d; sin(%f)=%f\0A\00"
-@.str2 = private global [11 x i8] c"[%d] = %d\0A\00"
+@.str2 = private global [11 x i8] c"[%d] = %f\0A\00"
 @.str3 = private global [8 x i8] c"Failed\0A\00"
 
 declare i32 @printf(ptr, ...)
@@ -8,15 +8,15 @@ declare double @llvm.sin(double)
 declare ptr @malloc(i64)
 declare void @free(ptr)
 declare void @exit(i64)
+declare double @llvm.pow.f64(double, double)
 
 ;; Calculate results for incoming array results
 ;; for function:
 ;;  f(x) = x^3 + 2x - 3(x/4 + 6sin(x/2))^1.2
 define ptr @formula1(ptr %arr, i32 %range) {
-    ; %d = sitofp i8 %i to double
     %1 = alloca double
     %2 = call double @llvm.sin(double 3.4)
-    call void @calc_formula1(i32 %range)
+    call void @calc_formula1(i32 3)
     
     call i32 (ptr, ...) @printf(ptr @.str1, i32 %range, double 3.4, double %2)
     ret ptr %1
@@ -44,13 +44,28 @@ define private void @calc_formula1(i32 %range) {
     ret void
 }
 
+define private double @calc_formula2(double %val) {
+    %ptr_val = alloca double
+    store double %val, ptr %ptr_val
+    %val1 = load double, ptr %ptr_val
+    %val_x_pow_3 = call double @llvm.pow.f64(double %val1, double 3.0)
+
+    %val2 = load double, ptr %ptr_val
+    %val_x_mul_2 = fmul double 2.0, %val2
+
+    %x_add =  fadd double %val_x_pow_3, %val_x_mul_2
+    ret double %x_add
+}
+
 define private void @prepare_vec(ptr %vec, i32 %range) {
     %ptr_arr = alloca ptr
     %ptr_range = alloca i32
     %ptr_i = alloca i32
+    %ptr_val = alloca double
     store ptr %vec, ptr %ptr_arr
     store i32 %range, ptr %ptr_range
     store i32 0, ptr %ptr_i
+    store double 0.0, ptr %ptr_val
     br label %next1
 
 next1:
@@ -60,19 +75,27 @@ next1:
 
 next2:
     %i1 = load i32, ptr %ptr_i
-    %ptr_mem1 = load ptr, ptr %ptr_arr
-    %index1 = sext i32 %i1 to i64
-    %ptr_mem2 = getelementptr inbounds i32, ptr %ptr_mem1, i64 %index1
-    store i32 %i1, ptr %ptr_mem2
+    %d = sitofp i32 %i1 to double
+    %val1 = call double @calc_formula2(double %d)
+    store double %val1, ptr %ptr_val
     br label %next3
 
 next3:
     %i2 = load i32, ptr %ptr_i
+    %ptr_mem1 = load ptr, ptr %ptr_arr
+    %val2 = load double, ptr %ptr_val
+    %index1 = sext i32 %i2 to i64
+    %ptr_mem2 = getelementptr inbounds i32, ptr %ptr_mem1, i64 %index1
+    store double %val2, ptr %ptr_mem2
+    br label %next4
+
+next4:
+    %i3 = load i32, ptr %ptr_i
     %range1 = load i32, ptr %ptr_range
-    %i3 = add i32 %i2, 1
-    store i32 %i3, ptr %ptr_i
-    %eq_next3 = icmp slt i32 %i3, %range1
-    br i1 %eq_next3, label %next2, label %end
+    %i4 = add i32 %i3, 1
+    store i32 %i4, ptr %ptr_i
+    %eq_next4 = icmp slt i32 %i4, %range1
+    br i1 %eq_next4, label %next2, label %end
 
 end:
     ret void
@@ -97,8 +120,8 @@ next2:
     %ptr_mem1 = load ptr, ptr %ptr_arr
     %index1 = sext i32 %i1 to i64
     %ptr_mem2 = getelementptr inbounds i32, ptr %ptr_mem1, i64 %index1
-    %i_arr = load i32, ptr %ptr_mem2
-    %p1 = call i32 (ptr, ...) @printf(ptr @.str2, i32 %i1, i32 %i_arr)
+    %i_arr = load double, ptr %ptr_mem2
+    %p1 = call i32 (ptr, ...) @printf(ptr @.str2, i32 %i1, double %i_arr)
     br label %next3
 
 next3:
