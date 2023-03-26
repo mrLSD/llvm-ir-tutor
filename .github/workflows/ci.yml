@@ -13,6 +13,6 @@ jobs:
         with:
           version: "15.0"
       - name: Run 1
-        run: ls -la ${{ env.LLVM_PATH }}/bin
+        run: echo ${{ env.LLVM_PATH }}
       - name: Run
-        run: ${{ env.LLVM_PATH }}/bin/llc --version
+        run: llc --version

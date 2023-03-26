@@ -1,5 +1,5 @@
 @.str1 = private global [31 x i8] c"Formula range: %d; sin(%f)=%f\0A\00"
-@.str2 = private global [11 x i8] c"[%d] = %f\0A\00"
+@.str2 = private global [12 x i8] c"[%d] = %lf\0A\00"
 @.str3 = private global [8 x i8] c"Failed\0A\00"
 
 declare i32 @printf(ptr, ...)
@@ -16,7 +16,7 @@ declare double @llvm.pow.f64(double, double)
 define ptr @formula1(ptr %arr, i32 %range) {
     %1 = alloca double
     %2 = call double @llvm.sin(double 3.4)
-    call void @calc_formula1(i32 3)
+    call void @calc_formula1(i32 %range)
     
     call i32 (ptr, ...) @printf(ptr @.str1, i32 %range, double 3.4, double %2)
     ret ptr %1
@@ -28,7 +28,7 @@ define private void @calc_formula1(i32 %range) {
     %ptr_range = alloca i32
     store i32 %range, ptr %ptr_range
 
-    %mem_ptr1 = call ptr @vec_new_with_capacity_raw(i32 %range, i32 8)
+    %mem_ptr1 = call ptr @vec_new_with_capacity_raw(i32 %range, i32 16)
     store ptr %mem_ptr1, ptr %ptr_arr
 
     %mem_ptr2 = load ptr, ptr %ptr_arr
@@ -83,9 +83,9 @@ next2:
 next3:
     %i2 = load i32, ptr %ptr_i
     %ptr_mem1 = load ptr, ptr %ptr_arr
-    %val2 = load double, ptr %ptr_val
     %index1 = sext i32 %i2 to i64
-    %ptr_mem2 = getelementptr inbounds i32, ptr %ptr_mem1, i64 %index1
+    %ptr_mem2 = getelementptr inbounds double, ptr %ptr_mem1, i64 %index1
+    %val2 = load double, ptr %ptr_val
     store double %val2, ptr %ptr_mem2
     br label %next4
 
@@ -119,7 +119,7 @@ next2:
     %i1 = load i32, ptr %ptr_i
     %ptr_mem1 = load ptr, ptr %ptr_arr
     %index1 = sext i32 %i1 to i64
-    %ptr_mem2 = getelementptr inbounds i32, ptr %ptr_mem1, i64 %index1
+    %ptr_mem2 = getelementptr inbounds double, ptr %ptr_mem1, i64 %index1
     %i_arr = load double, ptr %ptr_mem2
     %p1 = call i32 (ptr, ...) @printf(ptr @.str2, i32 %i1, double %i_arr)
     br label %next3
