@@ -23,7 +23,6 @@ define ptr @formula1(ptr %arr, i32 %range) {
 }
 
 define private void @calc_formula1(i32 %range) {
-    ; Init array for `double` type (sizeof = 8)
     %ptr_arr = alloca ptr
     %ptr_range = alloca i32
     store i32 %range, ptr %ptr_range
@@ -53,8 +52,20 @@ define private double @calc_formula2(double %val) {
     %val2 = load double, ptr %ptr_val
     %val_x_mul_2 = fmul double 2.0, %val2
 
+    %val3 = load double, ptr %ptr_val
+    %val_x_div_4 = fdiv double %val3, 4.0
+
+    %val4 = load double, ptr %ptr_val
+    %val_x_div_2 = fdiv double %val4, 2.0
+
+    %sin_x = call double @llvm.sin(double %val_x_div_2)
+    %sin_x6 = fmul double 6.0, %sin_x
+    %x_div_plus_6sin_x = fadd double %sin_x6, %val_x_div_2
+    %pow_x_div_plus_6sin_x = call double @llvm.pow.f64(double %x_div_plus_6sin_x, double 1.2)
+    %pow_3 = fmul double %pow_x_div_plus_6sin_x, 3.0
     %x_add =  fadd double %val_x_pow_3, %val_x_mul_2
-    ret double %x_add
+    %res = fsub double %x_add, %pow_3
+    ret double %res
 }
 
 define private void @prepare_vec(ptr %vec, i32 %range) {

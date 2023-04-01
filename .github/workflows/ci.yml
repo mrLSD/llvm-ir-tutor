@@ -15,4 +15,4 @@ jobs:
       - name: Run 1
         run: echo ${{ env.LLVM_PATH }}
       - name: Run
-        run: llc --version
+        run: CFG=llvm make

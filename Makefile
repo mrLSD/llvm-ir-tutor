@@ -11,11 +11,17 @@ LLC_ARGS = --thread-model=posix --filetype=obj
 LLVM_AS = llvm-as
 LLVM_AS_ARGS = --data-layout=e-m:o-i64:64-i128:128-n32:64-S128
 
+LL = "123"
+
 GCC = gcc
 GCC_ARGS =
 
 OS = $(shell uname)
-ifeq ($(OS),Darwin)
+ifeq ($(CFG),llvm)
+	LLC = llc
+	GCC = clang
+
+else ifeq ($(OS),Darwin)
 	LLD = ld64.lld
 	LLD_ARGS = -arch arm64 -platform_version macos 12.0.0 13.1 -syslibroot /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk -lSystem /Library/Developer/CommandLineTools/usr/lib/clang/14.0.0/lib/darwin/libclang_rt.osx.a
 else ifeq ($(OS),Linux)
