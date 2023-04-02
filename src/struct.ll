@@ -6,8 +6,16 @@
 
 define void @struct1_run() {
     %ptr_arr1 = alloca %Arr
+    %ptr_i = alloca i32
+    store i32 0, ptr %ptr_i
     %arr1 = call %Arr @struct1()
     store %Arr %arr1, ptr %ptr_arr1
+    br label %loop
+
+loop:
+    br label %end
+
+end:
     ret void
 }
 
