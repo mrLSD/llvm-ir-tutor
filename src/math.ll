@@ -3,7 +3,6 @@
 @.str3 = private global [8 x i8] c"Failed\0A\00"
 
 declare i32 @printf(ptr, ...)
-declare double @pow(double, double)
 declare double @llvm.sin(double)
 declare ptr @malloc(i64)
 declare void @free(ptr)

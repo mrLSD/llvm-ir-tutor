@@ -27,7 +27,7 @@ else ifeq ($(OS),Linux)
 	GCC_ARGS = -lm
 	LLC = docker run --rm -v `pwd`:/llvm -w /llvm mrlsd/llc:15.07
 	LLD = ld.lld-12
-	LLD_ARGS = -dynamic-linker /lib64/ld-linux-x86-64.so.2 /usr/lib/x86_64-linux-gnu/crt1.o /usr/lib/x86_64-linux-gnu/crti.o /usr/lib/x86_64-linux-gnu/crtn.o -lc -L /usr/lib/x86_64-linux-gnu/
+	LLD_ARGS = -dynamic-linker /lib64/ld-linux-x86-64.so.2 /usr/lib/x86_64-linux-gnu/crt1.o /usr/lib/x86_64-linux-gnu/crti.o /usr/lib/x86_64-linux-gnu/crtn.o -lc -lm -L /usr/lib/x86_64-linux-gnu/
 	LLVM_AS = llvm-as-12
 endif
 

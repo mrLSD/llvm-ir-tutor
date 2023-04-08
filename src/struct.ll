@@ -28,10 +28,10 @@ loop:
     ; Struct s = arr.[i]
     %ptr_st3 = getelementptr %Arr, ptr %ptr_arr, i32 0, i32 0
     ; s[i].1 = i
-    %ptr_st4 = getelementptr [10 x %Struct], ptr %ptr_st3, i32 %i1, i32 1
+    %ptr_st4 = getelementptr [10 x %Struct], ptr %ptr_st3, i32 0, i32 %i1, i32 1
     %res1 = load i32, ptr %ptr_st2
     %res2 = load i32, ptr %ptr_st4
-    %p1 = call i32 @printf(ptr @.str1, i32 12, i32 21, i32 %res2, i32 %st_1)
+    %p1 = call i32 @printf(ptr @.str1, i32 %i1, i32 %res1, i32 %res2, i32 %st_1)
     %eq_loop = icmp slt i32 %i2, 10
     br i1 %eq_loop, label %loop, label %end
 
@@ -58,8 +58,8 @@ loop:
     ; Struct s = arr.[i]
     %ptr_st2 = getelementptr %Arr, ptr %ptr_arr, i32 0, i32 0
     ; s[i].1 = i
-    %ptr_st3 = getelementptr [10 x %Struct], ptr %ptr_st2, i32 %i1, i32 1
-    store i32 %i1, ptr %ptr_st3
+    %ptr_st3 = getelementptr [10 x %Struct], ptr %ptr_st2, i32 0, i32 %i1, i32 1
+    store i32 %i2, ptr %ptr_st3
     %eq_loop = icmp slt i32 %i2, 10
     br i1 %eq_loop, label %loop, label %next
 
