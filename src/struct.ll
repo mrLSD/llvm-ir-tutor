@@ -1,10 +1,17 @@
 @.str1 = private global [23 x i8] c"St{[%d].{%d, %d}, %d}\0A\00"
+@.str2 = private global [15 x i8] c"StI64[%d]{%d}\0A\00"
 
 %Struct = type { i64, i64 }
 %Arr = type {
     [10 x %Struct],   ; fixed size array
     i32               ; length
 }
+
+;; Example: store type StructI64 through `ptr` to %StructAsSlice type
+;; It is possible because `StructAsSlice` declared with fixed size
+;; array with size of struct `StructI64`: [8 x i8] 
+%StructAsSlice = type { [8 x i8] }
+%StructI64 = type { i64 }
 
 declare i32 @printf(ptr, ...)
 
@@ -36,6 +43,7 @@ loop:
     br i1 %eq_loop, label %loop, label %end
 
 end:
+    call void @struct_as_slice_run()
     ret void
 }
 
@@ -72,4 +80,18 @@ next:
 end:
     %arr = load %Arr, ptr %ptr_arr
     ret %Arr %arr
+}
+
+;; Example: store one type (StructI64) through pointer to
+;; another basic type (StructAsSlice). And read again to (StructI64).
+;; It's possible because `StructAsSlice` declared as array with 
+;; size of struct `StructI64`: [8 x i8]
+define void @struct_as_slice_run() {
+    %st = alloca %StructAsSlice 
+    %ptr_mem1 = getelementptr %StructAsSlice, ptr %st, i32 0, i32 0
+    store i64 333, ptr %ptr_mem1
+    %ptr_mem2 = getelementptr %StructI64, ptr %st, i32 0, i32 0
+    %i1 = load i64, ptr %ptr_mem2
+    %p1 = call i32 @printf(ptr @.str2, i8 0, i64 %i1)    
+    ret void
 }
