@@ -13,6 +13,18 @@
 %StructAsSlice = type { [8 x i8] }
 %StructI64 = type { i64 }
 
+;; Enum implementation.
+;; Enum = { IndexOfEnumElement, MaxSizeOfType }
+;; where MaxSizeOfType calculated by maximum size of type.
+;; For example: i8 (1 byte), i32 (4 byte), i64 (8 byte)
+;; so i64 is MaxSizeOf type = 8 bytes
+%Enum = type { i8, [8 x i8] }
+%EnumI64 = type { i8, i64 }
+%EnumBool = type { i8, i1 }
+%StructF64 = type { i8, double }
+%EnumToken = type { i8 }
+
+
 declare i32 @printf(ptr, ...)
 
 define void @struct1_run() {
@@ -44,6 +56,7 @@ loop:
 
 end:
     call void @struct_as_slice_run()
+    call void @enum_run()
     ret void
 }
 
@@ -88,10 +101,25 @@ end:
 ;; size of struct `StructI64`: [8 x i8]
 define void @struct_as_slice_run() {
     %st = alloca %StructAsSlice 
+    ; Also valid type: StructI64
+    ; It's just example, it can be StructAsSlice or StructI64
     %ptr_mem1 = getelementptr %StructAsSlice, ptr %st, i32 0, i32 0
     store i64 333, ptr %ptr_mem1
+    
     %ptr_mem2 = getelementptr %StructI64, ptr %st, i32 0, i32 0
     %i1 = load i64, ptr %ptr_mem2
     %p1 = call i32 @printf(ptr @.str2, i8 0, i64 %i1)    
+    ret void
+}
+
+;; Store and read data from Enum type.
+;; How it works: allocate `Enum` type ptr variable
+define void @enum_run() {
+    %st = alloca %Enum 
+    ; %ptr_mem1 = getelementptr %Enum64, ptr %st, i32 0, i32 1
+    ; store i64 333, ptr %ptr_mem1
+    ; %ptr_mem2 = getelementptr %StructI64, ptr %st, i32 0, i32 0
+    ; %i1 = load i64, ptr %ptr_mem2
+    ; %p1 = call i32 @printf(ptr @.str2, i8 0, i64 %i1)    
     ret void
 }
