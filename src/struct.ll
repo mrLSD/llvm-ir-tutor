@@ -1,5 +1,8 @@
 @.str1 = private global [23 x i8] c"St{[%d].{%d, %d}, %d}\0A\00"
 @.str2 = private global [15 x i8] c"StI64[%d]{%d}\0A\00"
+@.str3 = private global [15 x i8] c"StF64[%d]{%f}\0A\00"
+@.str4 = private global [16 x i8] c"StBool[%d]{%d}\0A\00"
+@.str5 = private global [17 x i8] c"StToken[%d]{%d}\0A\00"
 
 %Struct = type { i64, i64 }
 %Arr = type {
@@ -21,7 +24,7 @@
 %Enum = type { i8, [8 x i8] }
 %EnumI64 = type { i8, i64 }
 %EnumBool = type { i8, i1 }
-%StructF64 = type { i8, double }
+%EnumF64 = type { i8, double }
 %EnumToken = type { i8 }
 
 
@@ -115,11 +118,39 @@ define void @struct_as_slice_run() {
 ;; Store and read data from Enum type.
 ;; How it works: allocate `Enum` type ptr variable
 define void @enum_run() {
-    %st = alloca %Enum 
-    ; %ptr_mem1 = getelementptr %Enum64, ptr %st, i32 0, i32 1
-    ; store i64 333, ptr %ptr_mem1
-    ; %ptr_mem2 = getelementptr %StructI64, ptr %st, i32 0, i32 0
-    ; %i1 = load i64, ptr %ptr_mem2
-    ; %p1 = call i32 @printf(ptr @.str2, i8 0, i64 %i1)    
+    %enI64 = alloca %Enum
+    %enBool = alloca %Enum
+    %enF64 = alloca %Enum
+    %enToken = alloca %Enum
+    
+    %ptr_mem1 = getelementptr inbounds %EnumI64, ptr %enI64, i32 0, i32 1
+    store i64 333, ptr %ptr_mem1
+    store i8 0, ptr %enI64
+    
+    %ptr_mem2 = getelementptr inbounds %EnumF64, ptr %enF64, i32 0, i32 1
+    store double 2.1, ptr %ptr_mem2
+    store i8 1, ptr %enF64    
+  
+    %ptr_mem3 = getelementptr inbounds %EnumBool, ptr %enBool, i32 0, i32 1
+    store i1 1, ptr %ptr_mem3
+    store i8 2, ptr %enBool  
+    
+    store i8 3, ptr %enToken
+    
+    %i1 = load i64, ptr %ptr_mem1
+    %ind1 = load i8, ptr %enI64
+    %p1 = call i32 @printf(ptr @.str2, i8 %ind1, i64 %i1)
+    
+    %i2 = load double, ptr %ptr_mem2
+    %ind2 = load i8, ptr %enF64
+    %p2 = call i32 @printf(ptr @.str3, i8 %ind2, double %i2)    
+    
+    %i3 = load i1, ptr %ptr_mem3
+    %ind3 = load i8, ptr %enBool
+    %p3 = call i32 @printf(ptr @.str4, i8 %ind3, i1 %i3)    
+
+    %ind4 = load i8, ptr %enToken
+    %p4 = call i32 @printf(ptr @.str5, i8 %ind4, i64 0)
+        
     ret void
 }
