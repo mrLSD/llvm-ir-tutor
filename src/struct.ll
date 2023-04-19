@@ -1,8 +1,10 @@
 @.str1 = private global [23 x i8] c"St{[%d].{%d, %d}, %d}\0A\00"
 @.str2 = private global [15 x i8] c"StI64[%d]{%d}\0A\00"
-@.str3 = private global [15 x i8] c"StF64[%d]{%f}\0A\00"
-@.str4 = private global [16 x i8] c"StBool[%d]{%d}\0A\00"
-@.str5 = private global [17 x i8] c"StToken[%d]{%d}\0A\00"
+@.str3 = private global [15 x i8] c"StI16[%d]{%d}\0A\00"
+@.str4 = private global [15 x i8] c"StI32[%d]{%d}\0A\00"
+@.str5 = private global [15 x i8] c"StF64[%d]{%f}\0A\00"
+@.str6 = private global [16 x i8] c"StBool[%d]{%d}\0A\00"
+@.str7 = private global [17 x i8] c"StToken[%d]{%d}\0A\00"
 
 %Struct = type { i64, i64 }
 %Arr = type {
@@ -23,10 +25,11 @@
 ;; so i64 is MaxSizeOf type = 8 bytes
 %Enum = type { i8, [8 x i8] }
 %EnumI64 = type { i8, i64 }
-%EnumBool = type { i8, i1 }
+%EnumBool = type { i8, i8 }
 %EnumF64 = type { i8, double }
+%EnumI16 = type { i8, i16 }
+%EnumI32 = type { i8, i32 }
 %EnumToken = type { i8 }
-
 
 declare i32 @printf(ptr, ...)
 
@@ -117,40 +120,72 @@ define void @struct_as_slice_run() {
 
 ;; Store and read data from Enum type.
 ;; How it works: allocate `Enum` type ptr variable
+;; Be carfully: index zext i8 -> i64 is required action
 define void @enum_run() {
+    ;===============================
+    ; Allocate enum types
     %enI64 = alloca %Enum
     %enBool = alloca %Enum
     %enF64 = alloca %Enum
+    %enI16 = alloca %Enum
+    %enI32 = alloca %Enum
     %enToken = alloca %Enum
-    
+  
+    ;===============================
+    ; Set enum data  
     %ptr_mem1 = getelementptr inbounds %EnumI64, ptr %enI64, i32 0, i32 1
     store i64 333, ptr %ptr_mem1
     store i8 0, ptr %enI64
+ 
+    %ptr_mem2 = getelementptr inbounds %EnumI16, ptr %enI16, i32 0, i32 1
+    store i64 222, ptr %ptr_mem2
+    store i8 1, ptr %enI16
     
-    %ptr_mem2 = getelementptr inbounds %EnumF64, ptr %enF64, i32 0, i32 1
-    store double 2.1, ptr %ptr_mem2
-    store i8 1, ptr %enF64    
+    %ptr_mem3 = getelementptr inbounds %EnumI32, ptr %enI32, i32 0, i32 1
+    store i64 111, ptr %ptr_mem3
+    store i8 2, ptr %enI32    
+    
+    %ptr_mem4 = getelementptr inbounds %EnumF64, ptr %enF64, i32 0, i32 1
+    store double 2.1, ptr %ptr_mem4
+    store i8 3, ptr %enF64    
   
-    %ptr_mem3 = getelementptr inbounds %EnumBool, ptr %enBool, i32 0, i32 1
-    store i1 1, ptr %ptr_mem3
-    store i8 2, ptr %enBool  
+    %ptr_mem5 = getelementptr inbounds %EnumBool, ptr %enBool, i32 0, i32 1
+    store i8 1, ptr %ptr_mem5
+    store i8 4, ptr %enBool  
     
-    store i8 3, ptr %enToken
+    ; Set token data - just index
+    store i8 5, ptr %enToken
     
+    ;===============================
+    ; Read & print Enum data
     %i1 = load i64, ptr %ptr_mem1
-    %ind1 = load i8, ptr %enI64
-    %p1 = call i32 @printf(ptr @.str2, i8 %ind1, i64 %i1)
+    %_ind1 = load i8, ptr %enI64
+    %ind1 = zext i8 %_ind1 to i64    
+    %p1 = call i32 @printf(ptr @.str2, i64 %ind1, i64 %i1)
     
-    %i2 = load double, ptr %ptr_mem2
-    %ind2 = load i8, ptr %enF64
-    %p2 = call i32 @printf(ptr @.str3, i8 %ind2, double %i2)    
+    %i2 = load i16, ptr %ptr_mem2
+    %_ind2 = load i8, ptr %enI16
+    %ind2 = zext i8 %_ind2 to i64    
+    %p2 = call i32 @printf(ptr @.str3, i64 %ind2, i16 %i2)    
     
-    %i3 = load i1, ptr %ptr_mem3
-    %ind3 = load i8, ptr %enBool
-    %p3 = call i32 @printf(ptr @.str4, i8 %ind3, i1 %i3)    
+    %i3 = load i32, ptr %ptr_mem3
+    %_ind3 = load i8, ptr %enI32
+    %ind3 = zext i8 %_ind3 to i64    
+    %p3 = call i32 @printf(ptr @.str4, i64 %ind3, i32 %i3)    
+    
+    %i4 = load double, ptr %ptr_mem4
+    %_ind4 = load i8, ptr %enF64
+    %ind4 = zext i8 %_ind4 to i64
+    %p4 = call i32 @printf(ptr @.str5, i64 %ind4, double %i4)    
+    
+    %i5 = load i8, ptr %ptr_mem5
+    %_ind5 = load i8, ptr %enBool
+    %ind5 = zext i8 %_ind5 to i64
+    %p5 = call i32 @printf(ptr @.str6, i64 %ind5, i8 %i5)    
 
-    %ind4 = load i8, ptr %enToken
-    %p4 = call i32 @printf(ptr @.str5, i8 %ind4, i64 0)
+    %_ind6 = load i8, ptr %enToken
+    %ind6 = zext i8 %_ind6 to i64
+    %p6 = call i32 @printf(ptr @.str7, i64 %ind6, i64 0)
         
     ret void
 }
