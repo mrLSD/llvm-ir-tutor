@@ -31,6 +31,9 @@
 %EnumI32 = type { i8, i32 }
 %EnumToken = type { i8 }
 
+;; Point type: Pointer { i32 x, i32 y }
+%Point = struct { i32, i32 }
+
 declare i32 @printf(ptr, ...)
 
 define void @struct1_run() {
@@ -187,5 +190,34 @@ define void @enum_run() {
     %ind6 = zext i8 %_ind6 to i64
     %p6 = call i32 @printf(ptr @.str7, i64 %ind6, i64 0)
         
+    ret void
+}
+
+;; Add points: 
+;; Point: p, p1, p2
+;; add_points(p*, p1, p2) { p = p1 + p2 }
+;; return to `ptr p*`
+;; - `sret` attribute indicates that this is the return value
+;; - `byval` attribute indicates that parametr are structs that are passed by value
+define void @add_points(ptr sret %point, ptr byval %p1, ptr byval %p2) {
+    ; p1.x + p2.x
+    %ptr_p1x = getelementptr %Point, ptr p1, i32 0, i32 0
+    %ptr_p2x = getelementptr %Point, ptr p2, i32 0, i32 0
+    %ptr_px = getelementptr %Point, ptr point, i32 0, i32 0
+    %1 = load i32, ptr %ptr_p1x
+    %2 = load i32, ptr %ptr_p2x
+    %3 = add i32 %1, %2
+    ; p = p1.x + p2.x
+    store i32 %3, ptr %ptr_px
+
+    ; p1.y + p2.y
+    %ptr_p1y = getelementptr %Point, ptr p1, i32 0, i32 1
+    %ptr_p2y = getelementptr %Point, ptr p2, i32 0, i32 1
+    %ptr_py = getelementptr %Point, ptr point, i32 0, i32 1
+    %4 = load i32, ptr %ptr_p1y
+    %5 = load i32, ptr %ptr_p2y
+    %6 = add i32 %4, %5
+    ; p = p1.y + p2.y
+    store i32 %6, ptr %ptr_py
     ret void
 }
