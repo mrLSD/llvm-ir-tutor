@@ -5,6 +5,7 @@
 @.str5 = private global [15 x i8] c"StF64[%d]{%f}\0A\00"
 @.str6 = private global [16 x i8] c"StBool[%d]{%d}\0A\00"
 @.str7 = private global [17 x i8] c"StToken[%d]{%d}\0A\00"
+@.str8 = private global [49 x i8] c"Point{x,y}: p{%d, %d} = p1{%d, %d} + p2{%d, %d}\0A\00"
 
 %Struct = type { i64, i64 }
 %Arr = type {
@@ -32,11 +33,11 @@
 %EnumToken = type { i8 }
 
 ;; Point type: Pointer { i32 x, i32 y }
-%Point = struct { i32, i32 }
+%Point = type { i32, i32 }
 
 declare i32 @printf(ptr, ...)
 
-define void @struct1_run() {
+define void @struct_run() {
     %ptr_arr = alloca %Arr
     %ptr_i = alloca i32
     store i32 0, ptr %ptr_i
@@ -66,6 +67,7 @@ loop:
 end:
     call void @struct_as_slice_run()
     call void @enum_run()
+    call void @run_add_points()
     ret void
 }
 
@@ -193,17 +195,43 @@ define void @enum_run() {
     ret void
 }
 
+define void @run_add_points() {
+    %p = alloca %Point
+    %p1 = alloca %Point
+    %p2 = alloca %Point
+    %ptr_p1x = getelementptr %Point, ptr %p1, i32 0, i32 0
+    %ptr_p1y = getelementptr %Point, ptr %p1, i32 0, i32 1
+    %ptr_p2x = getelementptr %Point, ptr %p2, i32 0, i32 0
+    %ptr_p2y = getelementptr %Point, ptr %p2, i32 0, i32 1    
+    store i32 10, ptr %ptr_p1x
+    store i32 31, ptr %ptr_p2x
+    store i32 12, ptr %ptr_p1y
+    store i32 23, ptr %ptr_p2y    
+    call void @add_points(ptr %p, ptr %p1, ptr %p2)
+
+    %ptr_px = getelementptr %Point, ptr %p, i32 0, i32 0
+    %ptr_py = getelementptr %Point, ptr %p, i32 0, i32 1    
+    %p1x = load i32, ptr %ptr_p1x
+    %p1y = load i32, ptr %ptr_p1y
+    %p2x = load i32, ptr %ptr_p2x
+    %p2y = load i32, ptr %ptr_p2y
+    %px = load i32, ptr %ptr_px
+    %py = load i32, ptr %ptr_py    
+    %_r = call i32 @printf(ptr @.str8, i32 %px, i32 %py, i32 %p1x, i32 %p1y, i32 %p2x, i32 %p2y)
+    ret void
+}
+
 ;; Add points: 
 ;; Point: p, p1, p2
 ;; add_points(p*, p1, p2) { p = p1 + p2 }
 ;; return to `ptr p*`
 ;; - `sret` attribute indicates that this is the return value
 ;; - `byval` attribute indicates that parametr are structs that are passed by value
-define void @add_points(ptr sret %point, ptr byval %p1, ptr byval %p2) {
+define void @add_points(ptr %point, ptr %p1, ptr %p2) {
     ; p1.x + p2.x
-    %ptr_p1x = getelementptr %Point, ptr p1, i32 0, i32 0
-    %ptr_p2x = getelementptr %Point, ptr p2, i32 0, i32 0
-    %ptr_px = getelementptr %Point, ptr point, i32 0, i32 0
+    %ptr_p1x = getelementptr %Point, ptr %p1, i32 0, i32 0
+    %ptr_p2x = getelementptr %Point, ptr %p2, i32 0, i32 0
+    %ptr_px = getelementptr %Point, ptr %point, i32 0, i32 0
     %1 = load i32, ptr %ptr_p1x
     %2 = load i32, ptr %ptr_p2x
     %3 = add i32 %1, %2
@@ -211,9 +239,9 @@ define void @add_points(ptr sret %point, ptr byval %p1, ptr byval %p2) {
     store i32 %3, ptr %ptr_px
 
     ; p1.y + p2.y
-    %ptr_p1y = getelementptr %Point, ptr p1, i32 0, i32 1
-    %ptr_p2y = getelementptr %Point, ptr p2, i32 0, i32 1
-    %ptr_py = getelementptr %Point, ptr point, i32 0, i32 1
+    %ptr_p1y = getelementptr %Point, ptr %p1, i32 0, i32 1
+    %ptr_p2y = getelementptr %Point, ptr %p2, i32 0, i32 1
+    %ptr_py = getelementptr %Point, ptr %point, i32 0, i32 1
     %4 = load i32, ptr %ptr_p1y
     %5 = load i32, ptr %ptr_p2y
     %6 = add i32 %4, %5

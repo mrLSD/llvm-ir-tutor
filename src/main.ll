@@ -13,7 +13,7 @@ declare void @formula1(ptr, i32)
 declare i32 @calc()
 declare void @ext_func1(ptr, ptr)
 declare void @ext_func2(ptr nocapture, ptr nocapture, ptr nocapture)
-declare void @struct1_run()
+declare void @struct_run()
 declare void @ssa_sum(i32)
 
 define i32 @main() {
@@ -23,7 +23,7 @@ define i32 @main() {
 
     %3 = alloca double
     call void @formula1(ptr %3, i32 10)
-    call void @struct1_run()
+    call void @struct_run()
     call void @ssa_sum(i32 10)
     ret i32 %2
 }
